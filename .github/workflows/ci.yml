@@ -1,0 +1,59 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check out the merged Studio plugin contract
+        uses: actions/checkout@v6
+        with:
+          repository: NVIDIA-NeMo/nemo-platform
+          ref: 93c829b350cacaeaf2b7fcdf011c6ece90cb1d7a
+          path: nemo-platform
+          sparse-checkout: packages/nemo_platform_plugin
+      - uses: astral-sh/setup-uv@v9
+        with:
+          version: 0.9.14
+          python-version: "3.14"
+      - run: uv sync --dev
+      - run: uv run ruff format --check
+      - run: uv run ruff check
+      - name: Test against the stable plugin API
+        run: uv run pytest
+      - name: Test against the post-#594 plugin API
+        run: uv run pytest
+        env:
+          PYTHONPATH: ${{ github.workspace }}/nemo-platform/packages/nemo_platform_plugin/src
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.23.2
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.30.3
+          run_install: false
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - name: Verify the wheel bundle is current
+        run: git diff --exit-code -- ../src/nemo_zoomer_plugin/web/dist/index.js
