@@ -28,8 +28,8 @@ jobs:
           version: 0.9.14
           python-version: "3.14"
       - run: uv sync --dev
-      - run: uv run ruff format --check
-      - run: uv run ruff check
+      - run: uv run ruff format --check src tests
+      - run: uv run ruff check src tests
       - name: Test against the stable plugin API
         run: uv run pytest
       - name: Test against the post-#594 plugin API
