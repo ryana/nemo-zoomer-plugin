@@ -1,0 +1,1 @@
+Every node is also a question context. Ask why the first attempt failed. Zoomer answers from that section, can inspect the wider trace when needed, and returns citations that jump back to the supporting node. The answer is useful, and auditable.

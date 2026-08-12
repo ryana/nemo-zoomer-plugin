@@ -6,3 +6,7 @@ __pycache__/
 *.pyc
 /dist/
 web/node_modules/
+/demo/assets/
+/demo/audio/
+/demo/render/
+/demo/zoomer-nemo-demo.mp4

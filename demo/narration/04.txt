@@ -1,0 +1,1 @@
+That semantic zoom matters: leadership gets the outcome; an engineer can drill into the failed test, inspect the retry, and see exactly what changed—without losing their place in the run.

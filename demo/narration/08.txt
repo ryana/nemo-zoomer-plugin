@@ -1,0 +1,1 @@
+Everything specific—the service, generation jobs, database, U I, and question answering—lives in its own public repository. Install the Python package, and entry-point discovery supplies both the backend service and Studio bundle. Remove it, and Tree and List behave exactly as before.

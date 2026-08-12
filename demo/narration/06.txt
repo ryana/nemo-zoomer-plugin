@@ -1,0 +1,1 @@
+Hierarchy generation runs asynchronously and persists on the server. You can switch views or leave the page; progress and failure state remain truthful when you return. Regeneration is explicit and idempotent.

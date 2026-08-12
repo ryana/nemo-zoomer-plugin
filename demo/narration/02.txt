@@ -1,0 +1,1 @@
+Here’s a simple coding run. The raw stream jumps among prompts, model reasoning, tool calls, logs, and retries. It is complete, but expensive to understand. Zoomer groups those events into the phases a reviewer actually asks about: diagnose, implement, and verify.

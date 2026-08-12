@@ -1,0 +1,1 @@
+Open Zoomer beside Studio’s existing Tree and List views. At the top, you see the outcome, duration, token cost, and major phases. Expand only the branch you need. One screen can mix summary-level context with span-level evidence.

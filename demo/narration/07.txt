@@ -1,0 +1,1 @@
+The other half of the demo is how little NeMo had to know about Zoomer. NeMo exposes a generic trace-view slot and a shared host contract. The plugin exports an I D, label, React view, and optional activity indicator.

@@ -82,6 +82,12 @@ The browser bundle exports the standard `Root` and `navItems` symbols plus a
 `@nemo/common` stay external so the plugin runs inside Studio's provider tree
 and uses Studio's authenticated shared cache and UI.
 
+## Demo video source
+
+The reproducible two-minute product and extensibility demo—including its
+narration, deterministic capture harness, value overlays, captions, and FFmpeg
+compositor—lives in [`demo/`](demo/README.md).
+
 ## License
 
 Apache-2.0.
