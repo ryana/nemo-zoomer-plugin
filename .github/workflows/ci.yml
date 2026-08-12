@@ -23,7 +23,7 @@ jobs:
           ref: 93c829b350cacaeaf2b7fcdf011c6ece90cb1d7a
           path: nemo-platform
           sparse-checkout: packages/nemo_platform_plugin
-      - uses: astral-sh/setup-uv@v9
+      - uses: astral-sh/setup-uv@v8
         with:
           version: 0.9.14
           python-version: "3.14"
