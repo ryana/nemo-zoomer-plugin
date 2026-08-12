@@ -17,6 +17,7 @@ RENDER = ROOT / "render"
 FONT_REGULAR = Path("/System/Library/Fonts/Supplemental/Arial.ttf")
 FONT_BOLD = Path("/System/Library/Fonts/Supplemental/Arial Bold.ttf")
 FPS = 30
+TARGET_DURATION_SECONDS = 120.0
 SCENE_PADDING_SECONDS = 0.36
 NARRATION_DELAY_SECONDS = 0.15
 
@@ -91,7 +92,6 @@ def write_captions(durations: list[float]) -> Path:
     scene_start = 0.0
     for scene, duration in zip(SCENES, durations, strict=True):
         text = (NARRATION / f"{scene.stem}.txt").read_text().strip()
-        text = text.replace("I D", "ID").replace("U I", "UI")
         parts = sentences(text)
         weights = [len(part.split()) for part in parts]
         speech_duration = duration - SCENE_PADDING_SECONDS
@@ -123,7 +123,7 @@ def motion_expression(motion: str) -> tuple[str, str]:
     return ("iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)")
 
 
-def render_scene(scene: Scene, duration: float) -> Path:
+def render_scene(scene: Scene, duration: float, narration_tempo: float) -> Path:
     frames = round(duration * FPS)
     fade_out_start = max(duration - 0.28, 0.0)
     x_expression, y_expression = motion_expression(scene.motion)
@@ -140,7 +140,8 @@ def render_scene(scene: Scene, duration: float) -> Path:
         "fontcolor=white:fontsize=26:x=90:y=main_h-50,"
         "fade=t=in:st=0:d=0.24,"
         f"fade=t=out:st={fade_out_start:.3f}:d=0.28,format=yuv420p[v];"
-        f"[1:a]adelay={round(NARRATION_DELAY_SECONDS * 1000)},"
+        f"[1:a]atempo={narration_tempo:.8f},"
+        f"adelay={round(NARRATION_DELAY_SECONDS * 1000)},"
         "loudnorm=I=-16:TP=-2:LRA=7,apad,"
         f"atrim=0:{duration:.6f},"
         "afade=t=in:st=0:d=0.10,"
@@ -156,7 +157,7 @@ def render_scene(scene: Scene, duration: float) -> Path:
         "-i",
         str(ASSETS / scene.image),
         "-i",
-        str(AUDIO / f"{scene.stem}.aiff"),
+        str(AUDIO / f"{scene.stem}.wav"),
         "-filter_complex",
         video_filter,
         "-map",
@@ -186,13 +187,20 @@ def render_scene(scene: Scene, duration: float) -> Path:
 
 def main() -> None:
     RENDER.mkdir(exist_ok=True)
+    raw_durations = [probe_duration(AUDIO / f"{scene.stem}.wav") for scene in SCENES]
+    speech_target = TARGET_DURATION_SECONDS - len(SCENES) * SCENE_PADDING_SECONDS
+    narration_tempo = sum(raw_durations) / speech_target
+    if not 0.5 <= narration_tempo <= 2.0:
+        raise RuntimeError(
+            f"Narration tempo {narration_tempo:.3f} is outside FFmpeg's safe range"
+        )
     durations = [
-        probe_duration(AUDIO / f"{scene.stem}.aiff") + SCENE_PADDING_SECONDS
-        for scene in SCENES
+        raw_duration / narration_tempo + SCENE_PADDING_SECONDS
+        for raw_duration in raw_durations
     ]
     caption_path = write_captions(durations)
     scene_paths = [
-        render_scene(scene, duration)
+        render_scene(scene, duration, narration_tempo)
         for scene, duration in zip(SCENES, durations, strict=True)
     ]
     concat_path = RENDER / "concat.txt"
@@ -251,6 +259,7 @@ def main() -> None:
         "+faststart",
         str(final_path),
     )
+    print(f"narration tempo: {narration_tempo:.4f}x")
     print(final_path)
 
 

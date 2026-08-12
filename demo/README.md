@@ -6,7 +6,7 @@ The final edit includes:
 
 - nine 1920×1080 scenes
 - value-led lower thirds
-- macOS Samantha narration at 195 words per minute
+- natural neural narration using NVIDIA MagpieTTS Multilingual 357M with the `Sofia` voice
 - burned English captions and an embedded English subtitle track
 - subtle motion and scene fades
 
@@ -25,16 +25,24 @@ From another shell at the plugin root, capture the UI and generate narration:
 
 ```bash
 node demo/capture.mjs
-./demo/generate_narration.sh
 ```
 
-Render the video with the project’s uv environment and system FFmpeg:
+Generate narration on a CUDA host with the NVIDIA NeMo Speech dependencies installed:
+
+```bash
+uv run --no-project \
+  --with "nemo_toolkit[tts] @ git+https://github.com/NVIDIA-NeMo/Speech.git@main" \
+  --with kaldialign --with peft --with soundfile \
+  python demo/generate_narration.py --speaker Sofia
+```
+
+Then render the video with the project’s uv environment and system FFmpeg. The renderer applies one uniform tempo adjustment to fit the generated narration to exactly two minutes:
 
 ```bash
 uv run python demo/build_video.py
 ```
 
-The final artifact is written to `demo/zoomer-nemo-demo.mp4`. Generated screenshots, audio, intermediate renders, and the MP4 remain untracked.
+The final artifact is written to `demo/zoomer-nemo-demo.mp4`. Generated screenshots, audio, intermediate renders, and the MP4 remain untracked. The narration is AI-generated locally with an NVIDIA model; the closing frame includes that disclosure.
 
 ## Narrative
 
